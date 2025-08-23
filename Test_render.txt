@@ -1,0 +1,60 @@
+Laptop có màn hình ≠ WSL2 có display access
+
+Laptop Windows: Có màn hình vật lý và Windows display system
+WSL2 Ubuntu: Chạy trong máy ảo Linux, không có direct access tới display của Windows
+Kết quả: WSL2 về mặt kỹ thuật giống như "server without display"
+
+Coi WSL2 như "server" và dùng OSMesa
+
+Bước 1: Gỡ cài đặt cũ
+# Gỡ PyRender và PyOpenGL
+pip uninstall -y pyrender pyopengl pyopengl-accelerate
+
+# Xóa biến môi trường cũ
+unset PYOPENGL_PLATFORM
+unset EGL_DEVICE_ID
+unset LIBGL_ALWAYS_SOFTWARE
+unset MESA_GL_VERSION_OVERRIDE
+
+# Xóa từ .bashrc
+sed -i '/PYOPENGL_PLATFORM/d' ~/.bashrc
+sed -i '/EGL_DEVICE_ID/d' ~/.bashrc
+sed -i '/LIBGL_ALWAYS_SOFTWARE/d' ~/.bashrc
+sed -i '/MESA_GL_VERSION_OVERRIDE/d' ~/.bashrc
+
+# Clear cache
+pip cache purge
+
+Bước 2: Cài đặt OSMesa theo tài liệu
+# Cài đặt osmesa với sudo
+sudo apt update
+wget -c https://github.com/mmatl/travis_debs/raw/master/xenial/mesa_18.3.3-0.deb
+sudo dpkg -i ./mesa_18.3.3-0.deb || true
+sudo apt install -f
+
+Bước 3: Cài đặt PyOpenGL custom
+# Tạo thư mục 3rdparty
+mkdir -p 3rdparty
+cd 3rdparty
+
+# Clone PyOpenGL custom
+git clone https://github.com/mmatl/pyopengl.git --depth=1
+
+# Gỡ PyOpenGL cũ và cài mới
+python3 -m pip uninstall pyopengl
+python3 -m pip install ./pyopengl
+
+# Quay về thư mục gốc
+cd ..
+
+Bước 4: Thiết lập biến môi trường
+# Thêm osmesa vào environment variable
+echo "export PYOPENGL_PLATFORM=osmesa" >> ~/.bashrc
+export PYOPENGL_PLATFORM=osmesa
+
+# Reload bashrc
+source ~/.bashrc
+
+Bước 5: Cài lại PyRender
+# Cài PyRender
+python3 -m pip install pyrender
