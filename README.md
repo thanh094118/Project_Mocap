@@ -1,51 +1,61 @@
-# 🎥 Dự án Mocap - Monocular Video
+<!--
+ * @Date: 2025-08-24
+ * @Author: Your Name
+ * @Project: Mocap - Monocular Video
+ * @FilePath: /Readme.md
+-->
 
-## 📌 Mô tả tổng quan
-Dự án này sử dụng thư viện [EasyMocap](https://github.com/zju3dv/EasyMocap) để thực hiện **3D Human Motion Capture** từ **video monocular (một camera duy nhất)**.  
-Hệ thống hỗ trợ trích xuất khung hình, keypoints 2D, ước lượng dáng người 3D và tái tạo chuyển động theo thời gian.
+<div align="center">
+    <img src="logo.png" width="40%">
+</div>
+
+**Mocap - Monocular Video** là một dự án demo dựa trên [EasyMocap](https://github.com/zju3dv/EasyMocap), tập trung vào **3D human motion capture** từ **video monocular (một camera)**.  
+Dự án cung cấp pipeline: **extract frames → keypoints2D → pose3D → visualize motion**.
+
+![python](https://img.shields.io/badge/python-3.8+-blue)
+![pytorch](https://img.shields.io/badge/pytorch-1.8+-orange)
+![star](https://img.shields.io/github/stars/zju3dv/EasyMocap?style=social)
 
 ---
 
-## ⚡ Các tính năng chính
-- 🖼️ **Extract Image**: Tách khung hình từ video đầu vào.  
-- 📍 **Extract Keypoint2D**: Dự đoán keypoints 2D từ từng khung hình.  
-- 🧍 **Estimate Pose 3D**: Ước lượng tư thế người ở không gian 3D.  
-- 🎞️ **Reconstruction**: Tái dựng và theo dõi chuyển động khung xương.  
-- 🔎 **Phân tích, tối ưu**:  
-  - Lọc keypoints dựa trên confidence score.  
-  - Đồng bộ và tinh chỉnh chuyển động theo khung hình.  
-  - Tối ưu tham số khung xương để giảm nhiễu trong pose.  
+## ✨ Tính năng chính
+- 🖼️ **Extract Frames**: Trích xuất khung hình từ video.  
+- 📍 **Keypoints 2D**: Phát hiện keypoints 2D bằng OpenPose / HRNet / MediaPipe.  
+- 🧍 **Pose Estimation 3D**: Ước lượng tư thế người trong không gian 3D.  
+- 🎥 **Monocular Mocap Pipeline**: Toàn bộ quy trình từ video → 3D motion.  
+- 🔎 **Phân tích & tối ưu**:  
+  - Lọc keypoints theo confidence score.  
+  - Tinh chỉnh pose bằng thuật toán tối ưu.  
+  - Giảm nhiễu trong chuyển động khung xương.  
+
+<div align="center">
+    <img src="demo_monocular.gif" width="80%">
+    <br>
+    <sup>Ví dụ pipeline monocular video → 3D skeleton</sup>
+</div>
 
 ---
 
-## 🛠️ Cài đặt
+## ⚡ Cài đặt & Chạy
 
-1. Clone repository gốc
 ```bash
+# 1. Clone repo EasyMocap
 git clone https://github.com/zju3dv/EasyMocap.git
 cd EasyMocap
 
-2. Cài đặt môi trường
-
-Khuyến nghị dùng conda:
-conda create -n easymocap python=3.8
+# 2. Tạo môi trường Python
+conda create -n easymocap python=3.8 -y
 conda activate easymocap
 pip install -r requirements.txt
-3. Cài đặt thêm các mô hình hỗ trợ
 
-Tải pretrained models theo hướng dẫn tại: https://chingswy.github.io/easymocap-public-doc/
-Cách chạy
-1. Extract frames từ video
+# 3. Tải pretrained models (theo hướng dẫn)
+# 👉 https://chingswy.github.io/easymocap-public-doc/install/install.html
+
+# 4. Extract frames từ video
 python apps/preprocess/extract_video.py --input input.mp4 --output output/images
 
-2. Dự đoán keypoints 2D
+# 5. Extract keypoints 2D
 python apps/preprocess/extract_keypoints.py --input output/images --output output/keypoints2d
 
-3. Ước lượng pose 3D (monocular pipeline)
+# 6. Chạy monocular mocap pipeline
 python apps/demo/mocap_video.py --input input.mp4 --output output/mocap
-
-📚 Nguồn tài liệu
-
-Thư viện gốc: https://github.com/zju3dv/EasyMocap
-
-Tài liệu hướng dẫn setup & chạy: https://chingswy.github.io/easymocap-public-doc/
