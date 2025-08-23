@@ -23,8 +23,17 @@ Dự án cung cấp pipeline: **extract frames → keypoints2D → pose3D → vi
       <img src="./img/Extract F.png" width="70%">
   </div>
 - 📍 **Keypoints 2D**: Phát hiện keypoints 2D bằng OpenPose / HRNet / MediaPipe.  
+<div align="center">
+      <img src="./img/keypoints2d.png" width="70%">
+  </div>
 - 🧍 **Pose Estimation 3D**: Ước lượng tư thế người trong không gian 3D.  
+<div align="center">
+      <img src="./img/Mesh3d.png" width="70%">
+  </div>
 - 🎥 **Monocular Mocap Pipeline**: Toàn bộ quy trình từ video → 3D motion.  
+<div align="center">
+      <img src="./img/output.png" width="70%">
+  </div>
 - 🔎 **Phân tích & tối ưu**:  
   - Lọc keypoints theo confidence score.  
   - Tinh chỉnh pose bằng thuật toán tối ưu.  
