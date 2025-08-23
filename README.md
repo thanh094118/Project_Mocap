@@ -6,20 +6,22 @@
 -->
 
 <div align="center">
-    <img src="logo.png" width="40%">
+    <img src="img/logo.png" width="40%">
 </div>
 
 **Mocap - Monocular Video** là một dự án demo dựa trên [EasyMocap](https://github.com/zju3dv/EasyMocap), tập trung vào **3D human motion capture** từ **video monocular (một camera)**.  
 Dự án cung cấp pipeline: **extract frames → keypoints2D → pose3D → visualize motion**.
 
-![python](https://img.shields.io/badge/python-3.8+-blue)
-![pytorch](https://img.shields.io/badge/pytorch-1.8+-orange)
-![star](https://img.shields.io/github/stars/zju3dv/EasyMocap?style=social)
+![python](https://img.shields.io/badge/python-3.9+-blue)
+![pytorch](https://img.shields.io/badge/pytorch-2.4.1+-orange)
 
 ---
 
 ## ✨ Tính năng chính
 - 🖼️ **Extract Frames**: Trích xuất khung hình từ video.  
+<div align="center">
+      <img src="./img/Extract F.png" width="70%">
+  </div>
 - 📍 **Keypoints 2D**: Phát hiện keypoints 2D bằng OpenPose / HRNet / MediaPipe.  
 - 🧍 **Pose Estimation 3D**: Ước lượng tư thế người trong không gian 3D.  
 - 🎥 **Monocular Mocap Pipeline**: Toàn bộ quy trình từ video → 3D motion.  
