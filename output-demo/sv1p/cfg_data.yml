@@ -1,0 +1,13 @@
+module: myeasymocap.datasets.sv1p.SVDataset
+args:
+    root: data/images
+    subs: ['.']
+    ranges: [1, 1000, 1]
+    read_image: True
+    reader:
+        images:
+            root: images
+            ext: .jpg
+        image_shape:
+            root: images
+            ext: .jpg

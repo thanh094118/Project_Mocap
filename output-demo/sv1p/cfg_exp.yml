@@ -1,0 +1,150 @@
+module: myeasymocap.stages.basestage.MultiStage
+args:
+    output: output/sv1p
+    at_step:
+        detect:
+            module: myeasymocap.backbone.yolo.yolo.YoloWithTrack
+            key_from_data: ['images', 'imgnames']
+            args:
+                model: yolov5m
+                name: person
+        keypoints2d:
+            module: myeasymocap.backbone.hrnet.myhrnet.MyHRNet
+            key_from_data: ['images', 'imgnames']
+            key_from_previous: ['bbox']
+            key_keep: []
+            args:
+                ckpt: data/models/pose_hrnet_w48_384x288.pth
+        vis2d:
+            module: myeasymocap.io.vis.Vis2D
+            skip: False
+            key_from_data: ['images']
+            key_from_previous: ['keypoints', 'bbox']
+            args:
+                name: vis_keypoints2d
+                scale: 0.500000
+        infer:
+            module: myeasymocap.backbone.pare.pare.MyPARE
+            key_from_data: ['images', 'imgnames']
+            key_from_previous: ['bbox']
+            key_keep: ['cameras', 'imgnames']
+            args:
+                ckpt: 3dpw
+    at_final:
+        load_body_model:
+            module: myeasymocap.io.model.SMPLLoader
+            args:
+                model_path: models/pare/data/body_models/smpl/SMPL_NEUTRAL.pkl
+                regressor_path: models/J_regressor_body25.npy
+        init_translation:
+            module: myeasymocap.operations.init.InitTranslation
+            key_from_data: ['keypoints', 'cameras', 'params']
+            key_from_previous: ['body_model']
+            args:
+                solve_T: True
+                solve_R: False
+        smooth:
+            module: myeasymocap.operations.smooth.SmoothPoses
+            key_from_data: ['params']
+            args:
+                window_size: 2
+        mean_param:
+            module: myeasymocap.operations.init.MeanShapes
+            key_from_data: ['params']
+            args:
+                keys: ['shapes']
+        init_RT:
+            module: myeasymocap.operations.optimizer.Optimizer
+            key_from_data: ['keypoints', 'cameras']
+            key_from_previous: ['model', 'params']
+            args:
+                optimizer_args:
+                    optim_type: lbfgs
+                optimize_keys: ['Th', 'Rh']
+                loss:
+                    repro:
+                        weight: 100.000000
+                        module: myeasymocap.operations.loss.Keypoints2D
+                        key_from_output: ['keypoints']
+                        key_from_infos: ['keypoints', 'cameras']
+                        args:
+                            norm: l2
+                            index_est: [2, 5, 9, 12]
+                            index_gt: [2, 5, 9, 12]
+                    smooth:
+                        weight: 1.000000
+                        module: myeasymocap.operations.loss.Smooth
+                        key_from_output: ['Rh', 'Th']
+                        key_from_infos: ['cameras']
+                        args:
+                            keys: ['Th', 'Th']
+                            smooth_type: ['Linear', 'Depth']
+                            norm: ['l2', 'l2']
+                            order: [2, 2]
+                            weights: [100.0, 1000.0]
+                            window_weight: [0.5, 0.3, 0.1, 0.1]
+        refine_poses:
+            repeat: 2
+            module: myeasymocap.operations.optimizer.Optimizer
+            key_from_data: ['keypoints', 'cameras']
+            key_from_previous: ['model', 'params']
+            args:
+                optimizer_args:
+                    optim_type: lbfgs
+                optimize_keys: ['poses', 'Rh', 'Th']
+                loss:
+                    repro:
+                        weight: 100.000000
+                        module: myeasymocap.operations.loss.Keypoints2D
+                        key_from_output: ['keypoints']
+                        key_from_infos: ['keypoints', 'cameras']
+                        args:
+                            norm: gm
+                            norm_info: 0.020000
+                    smooth:
+                        weight: 1.000000
+                        module: myeasymocap.operations.loss.Smooth
+                        key_from_output: ['poses', 'Rh', 'Th', 'keypoints']
+                        key_from_infos: ['cameras']
+                        args:
+                            keys: ['Th', 'Th', 'poses', 'keypoints']
+                            smooth_type: ['Linear', 'Depth', 'Linear', 'Linear']
+                            norm: ['l2', 'l2', 'l2', 'l2']
+                            order: [2, 2, 2, 2]
+                            weights: [100.0, 1000.0, 50.0, 100.0]
+                            window_weight: [0.5, 0.3, 0.1, 0.1]
+                    init:
+                        weight: 1.000000
+                        module: myeasymocap.operations.loss.Init
+                        key_from_output: ['poses']
+                        key_from_infos: ['init_poses']
+                        args:
+                            keys: ['poses']
+                            norm: l2
+                            weights: [1.0]
+                    prior:
+                        weight: 0.100000
+                        module: easymocap.multistage.gmm.GMMPrior
+                        key_from_output: ['poses']
+                        key_from_infos: []
+                        args:
+                            start: 0
+                            end: 69
+        write:
+            module: myeasymocap.io.write.WriteSMPL
+            key_from_data: ['meta']
+            key_from_previous: ['params', 'model']
+            args:
+                name: smpl
+        render:
+            module: myeasymocap.io.vis3d.Render_hand
+            key_from_data: ['cameras', 'imgnames']
+            key_from_previous: ['params', 'body_model']
+            args:
+                backend: pyrender
+                part_segmentation_path: models/pare/data/smpl_partSegmentation_mapping.pkl
+        make_video:
+            module: myeasymocap.io.video.MakeVideo
+            args:
+                fps: 30
+                keep_image: False
