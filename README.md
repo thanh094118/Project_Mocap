@@ -36,14 +36,25 @@ Dự án cung cấp pipeline: **extract frames → keypoints2D → pose3D → vi
   </div>
 - 🔎 **Phân tích & tối ưu**:  
   - Lọc keypoints theo confidence score.  
-  - Tinh chỉnh pose bằng thuật toán tối ưu.  
-  - Giảm nhiễu trong chuyển động khung xương.  
 
 <div align="center">
-    <img src="demo_monocular.gif" width="80%">
+    <img src="./img/k1.png" width="40%">
+    <img src="./img/k2.png" width="40%">
     <br>
-    <sup>Ví dụ pipeline monocular video → 3D skeleton</sup>
+    <sup>Ví dụ pipeline monocular video → 2D body skeleton</sup>
 </div>
+<div align="center">
+    <img src="./img/k3.png" width="40%">
+    <br>
+    <sup>Ví dụ pipeline monocular video → 2D hand skeleton</sup>
+</div>
+<div align="center">
+    <img src="./img/k4.png" width="40%">
+    <br>
+    <sup>Ví dụ pipeline monocular video → 2D head skeleton</sup>
+</div>
+  - Giảm nhiễu trong chuyển động khung xương.  (updating)<br>
+  - Tinh chỉnh pose bằng thuật toán tối ưu.  (updating)
 
 ---
 
